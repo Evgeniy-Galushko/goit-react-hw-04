@@ -1,0 +1,22 @@
+.btnNavDown {
+  display: block;
+  position: fixed;
+  right: 0px;
+  bottom: 35px;
+  right: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-sizing: border-box;
+  padding: 5px;
+  width: 30px;
+  height: 30px;
+  background-color: #cceaf3;
+  border: none;
+
+  transition: all ease-in-out 0.5s;
+}
+
+.btnNavDown:hover {
+  background-color: #0048ff;
+  color: #fff;
+}

@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { GoChevronUp } from "react-icons/go";
+import { GoChevronDown } from "react-icons/go";
 
 import { ProgressBar } from "react-loader-spinner";
 import "./App.css";
@@ -9,6 +11,8 @@ import requestApi from "../request-api";
 import LoadMoreBtn from "./LoadMoreBtn/LoadMoreBtn";
 import ErrorMessage from "./ErrorMessage/ErrorMessage";
 import SetsearchFieldError from "./SetsearchFieldError/SetsearchFieldError";
+import BtnUp from "./BtnUp/BtnUp";
+import BtnDown from "./BtnDown/BtnDown";
 
 Modal.setAppElement("#root");
 
@@ -19,7 +23,7 @@ export default function App() {
   const [errorMessage, setErrorMessage] = useState(false);
   const [searchFieldError, setsearchFieldError] = useState(false);
   const [modalIsOpen, setIsOpen] = useState(false);
-  const [btnLoadIsOpen, setbtnLoadIsOpen] = useState(false);
+  // const [btnLoadIsOpen, setbtnLoadIsOpen] = useState(false);
 
   const [totalNumberOfPages, setTotalNumberOfPages] = useState(0);
   const [values, setValues] = useState("");
@@ -60,11 +64,9 @@ export default function App() {
           setLoading(true);
           setPages(1);
           const data = await requestApi(textMessage);
+          console.log(data.data.results);
           setTotalNumberOfPages(data.data.total_pages);
           setAnswers(data.data.results);
-          if (totalNumberOfPages > 0) {
-            setbtnLoadIsOpen(true);
-          }
         } catch (error) {
           console.log(error);
           setErrorMessage(true);
@@ -83,9 +85,13 @@ export default function App() {
   useEffect(() => {
     async function request() {
       try {
+        if (textMessage === "") {
+          return;
+        }
+        setLoading(true);
         const data = await requestApi(textMessage, pages);
         setTotalNumberOfPages(data.data.total_pages);
-        setAnswers(data.data.results);
+        setAnswers((prevImages) => [...prevImages, ...data.data.results]);
       } catch (error) {
         console.log(error);
         setErrorMessage(true);
@@ -96,8 +102,6 @@ export default function App() {
     request();
   }, [textMessage, pages]);
   console.log(pages);
-
-  // const numberOfPages = answers;
 
   const handleChange = (value) => {
     const id = value.target.id;
@@ -151,8 +155,18 @@ export default function App() {
           wrapperClass="progressar"
         />
       )}
-      {btnLoadIsOpen && (
+      {pages < totalNumberOfPages && (
         <LoadMoreBtn onClick={handleClick}>Load more</LoadMoreBtn>
+      )}
+      {pages >= 2 && (
+        <BtnUp>
+          <GoChevronUp size={20} />
+        </BtnUp>
+      )}
+      {pages >= 2 && (
+        <BtnDown>
+          <GoChevronDown size={20} />
+        </BtnDown>
       )}
     </>
   );

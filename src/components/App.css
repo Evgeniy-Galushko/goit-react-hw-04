@@ -39,16 +39,19 @@
 /* .card {
   /* padding: 2em; */
 /* } */
-*/
 
 /* .read-the-docs {
   color: #888;
 } */
 
+/* .progressbar { */
+/* top: 0px; */
+/* margin: 0 auto; */
+/* left: 100px; */
+/* } */
 
-
-.progressbar {
-  /* top: 0px; */
-  /* margin: 0 auto; */
-  /* left: 100px; */
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    scroll-behavior: smooth;
+  }
 }

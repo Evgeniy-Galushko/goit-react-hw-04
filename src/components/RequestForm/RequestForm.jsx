@@ -3,7 +3,7 @@ import { FcSearch } from "react-icons/fc";
 
 export default function RequestForm({ onSubmit }) {
   return (
-    <header className={s.header}>
+    <header className={s.header} id="up">
       <form className={s.form} onSubmit={onSubmit}>
         <button type="submit" className={s.button}>
           <FcSearch size={30} />
