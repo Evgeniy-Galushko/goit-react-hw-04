@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import { GoChevronUp } from "react-icons/go";
 import { GoChevronDown } from "react-icons/go";
 
-import { ProgressBar } from "react-loader-spinner";
 import "./App.css";
-import RequestForm from "./RequestForm/RequestForm";
+import SearchBar from "./SearchBar/SearchBar";
 import ImageGallery from "./ImageGallery/ImageGallery";
 import Modal from "react-modal";
 import requestApi from "../request-api";
@@ -13,73 +12,55 @@ import ErrorMessage from "./ErrorMessage/ErrorMessage";
 import SetsearchFieldError from "./SetsearchFieldError/SetsearchFieldError";
 import BtnUp from "./BtnUp/BtnUp";
 import BtnDown from "./BtnDown/BtnDown";
+import Loader from "./Loader/Loader";
+import ImageModal from "./ImageModal/ImageModal";
 
 Modal.setAppElement("#root");
 
 export default function App() {
   const [textMessage, setTextMessage] = useState("");
-  const [answers, setAnswers] = useState([]);
+  const [photoCollection, setPhotoCollection] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState(false);
-  const [searchFieldError, setsearchFieldError] = useState(false);
-  const [modalIsOpen, setIsOpen] = useState(false);
+  const [searchFieldError, setSearchFieldError] = useState(false);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
   // const [btnLoadIsOpen, setbtnLoadIsOpen] = useState(false);
 
   const [totalNumberOfPages, setTotalNumberOfPages] = useState(0);
-  const [values, setValues] = useState("");
-  const [pages, setPages] = useState(1);
+  const [modalPhoto, setModalPhoto] = useState("");
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
-    setAnswers([]);
+    setPhotoCollection([]);
   }, []);
 
   function openModal() {
-    setIsOpen(true);
+    setModalIsOpen(true);
   }
 
   function closeModal() {
-    setIsOpen(false);
+    setModalIsOpen(false);
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setsearchFieldError(false);
+    setPhotoCollection([]);
+    setErrorMessage(false);
+    setSearchFieldError(false);
+    setPage(1);
+    setSearchFieldError(false);
     const form = e.target;
     const requestText = form.elements.message.value.trim().toLowerCase();
     if (requestText === "") {
-      setAnswers([]);
-      setsearchFieldError(true);
+      setPhotoCollection([]);
+      setSearchFieldError(true);
       return;
     }
     setTextMessage(requestText);
   };
 
-  useEffect(() => {
-    if (textMessage.length !== 0) {
-      async function request() {
-        try {
-          setAnswers([]);
-          setErrorMessage(false);
-          setsearchFieldError(false);
-          setLoading(true);
-          setPages(1);
-          const data = await requestApi(textMessage);
-          console.log(data.data.results);
-          setTotalNumberOfPages(data.data.total_pages);
-          setAnswers(data.data.results);
-        } catch (error) {
-          console.log(error);
-          setErrorMessage(true);
-        } finally {
-          setLoading(false);
-        }
-      }
-      request();
-    }
-  }, [textMessage, totalNumberOfPages]);
-
   const handleClick = () => {
-    setPages(pages + 1);
+    setPage(page + 1);
   };
 
   useEffect(() => {
@@ -89,9 +70,13 @@ export default function App() {
           return;
         }
         setLoading(true);
-        const data = await requestApi(textMessage, pages);
+        if (!textMessage) return;
+        const data = await requestApi(textMessage, page);
         setTotalNumberOfPages(data.data.total_pages);
-        setAnswers((prevImages) => [...prevImages, ...data.data.results]);
+        setPhotoCollection((prevImages) => [
+          ...prevImages,
+          ...data.data.results,
+        ]);
       } catch (error) {
         console.log(error);
         setErrorMessage(true);
@@ -100,15 +85,11 @@ export default function App() {
       }
     }
     request();
-  }, [textMessage, pages]);
-  console.log(pages);
+  }, [textMessage, page]);
 
-  const handleChange = (value) => {
-    const id = value.target.id;
-    const filters = answers
-      .filter((answer) => answer.id === id)
-      .map((answer) => answer.urls.regular);
-    setValues(filters[0]);
+  const handleChange = (modalData) => {
+    setModalIsOpen(true);
+    setModalPhoto(modalData);
   };
 
   const customStyles = {
@@ -123,6 +104,8 @@ export default function App() {
     },
   };
 
+  console.log(page);
+
   return (
     <>
       <Modal
@@ -131,39 +114,29 @@ export default function App() {
         style={customStyles}
         contentLabel="Example Modal"
       >
-        <img src={values} width={650} height={800} />
+        <ImageModal photo={modalPhoto} />
       </Modal>
-      <RequestForm onSubmit={handleSubmit} />
+      <SearchBar onSubmit={handleSubmit} />
       {searchFieldError && <SetsearchFieldError />}
       {errorMessage ? (
         <ErrorMessage />
       ) : (
         <ImageGallery
-          fotos={answers}
+          fotos={photoCollection}
           openModal={openModal}
           handleChange={handleChange}
         />
       )}
-      {loading && (
-        <ProgressBar
-          visible={true}
-          height="80"
-          width="120"
-          color="#06f42c"
-          ariaLabel="progress-bar-loading"
-          wrapperStyle={{}}
-          wrapperClass="progressar"
-        />
-      )}
-      {pages < totalNumberOfPages && (
+      {loading && <Loader />}
+      {page < totalNumberOfPages && (
         <LoadMoreBtn onClick={handleClick}>Load more</LoadMoreBtn>
       )}
-      {pages >= 2 && (
+      {page >= 2 && (
         <BtnUp>
           <GoChevronUp size={20} />
         </BtnUp>
       )}
-      {pages >= 2 && (
+      {page >= 2 && (
         <BtnDown>
           <GoChevronDown size={20} />
         </BtnDown>

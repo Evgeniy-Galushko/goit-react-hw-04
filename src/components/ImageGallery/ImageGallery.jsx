@@ -1,12 +1,12 @@
 import s from "./ImageGallery.module.css";
 import ImageCard from "../ImageCard/ImageCard";
 
-export default function ImageGallery({ fotos, openModal, handleChange }) {
+export default function ImageGallery({ fotos, handleChange }) {
   return (
     <ul className={s.ul}>
       {fotos.map(({ id, urls, asset_type, likes, user }) => {
         return (
-          <li key={id} onClick={openModal} className={s.galleryCard}>
+          <li key={id} className={s.galleryCard}>
             <ImageCard
               id={id}
               likes={likes}
@@ -14,7 +14,9 @@ export default function ImageGallery({ fotos, openModal, handleChange }) {
               location={user.location}
               src={urls.small}
               alt={asset_type}
-              handleChange={handleChange}
+              handleChange={() =>
+                handleChange({ src: urls.regular, alt: asset_type })
+              }
             />
           </li>
         );

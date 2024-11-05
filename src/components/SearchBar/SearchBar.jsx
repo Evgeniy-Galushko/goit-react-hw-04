@@ -1,4 +1,4 @@
-import s from "./RequestForm.module.css";
+import s from "./SearchBar.module.css";
 import { FcSearch } from "react-icons/fc";
 
 export default function RequestForm({ onSubmit }) {
