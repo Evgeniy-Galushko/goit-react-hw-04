@@ -104,8 +104,6 @@ export default function App() {
     },
   };
 
-  console.log(page);
-
   return (
     <>
       <Modal
