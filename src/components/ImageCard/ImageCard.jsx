@@ -7,7 +7,7 @@ export default function ImageCard({
   handleChange,
   likes,
   user,
-  location = "Earth",
+  location,
 }) {
   if (location === null) {
     location = "Earth";
